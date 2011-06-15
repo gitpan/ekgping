@@ -1,0 +1,234 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use File::ShareDir qw(dist_file);
+use Getopt::Long;
+use IO::Handle;
+use IPC::Run qw(harness);
+use SDL::Mixer;
+use SDL::Music;
+use Term::Size;
+use Time::HiRes qw(usleep);
+
+our $VERSION = '1.0';
+
+my $beep       = 0;
+my $id         = 0;
+my $rtt        = 0;
+my $last_id    = 0;
+my $dead_count = 0;
+my $column     = 0;
+my $column_max = Term::Size::chars;
+
+my $beep_file = dist_file( 'ekgping', 'beep.ogg' );
+my $quiet = 0;
+
+GetOptions(
+
+	'f|beep-file=s' => \$beep_file,
+	'q|quiet'       => \$quiet,
+	'V|version'     => sub { say "ekgping version ${VERSION}"; exit 0 },
+
+) or usage();
+
+my $host       = shift or usage();
+my @ping_opts  = @ARGV;
+my $mixer      = SDL::Mixer->new();
+my $beep_sound = SDL::Music->new($beep_file);
+
+my $ping = harness(
+	[ 'ping', '-n', @ping_opts, $host ],
+	'<'  => \undef,
+	'>&' => \&parse_ping_output,
+);
+
+local $SIG{INT}  = \&quit;
+local $SIG{TERM} = \&quit;
+local $SIG{QUIT} = \&quit;
+
+sub parse_ping_output {
+	my ($line) = @_;
+
+	chomp($line);
+
+	if (
+		$line =~ m{ ^ \d+ \s bytes \s from \s \S+ \s
+			icmp_req = (?<id> \d+ ) \s
+			ttl = (?<ttl> \d+ ) \s
+			time = (?<time> [\d.]+) \s ms }x
+	  )
+	{
+		$id  = $+{id};
+		$rtt = $+{time};
+	}
+
+	return;
+}
+
+sub quit {
+	$ping->kill_kill( grace => 1 );
+	print "\e[?25h";
+	exit 0;
+}
+
+sub usage {
+	die("Usage: $0 [options] <host>\n");
+}
+
+$ping->start();
+
+# Ignore first line
+$ping->pump();
+
+if ( not $quiet ) {
+	$mixer->play_music( $beep_sound, 999_999 );
+	$mixer->pause_music();
+}
+
+print "\e[?25l";
+
+while ( usleep(100_000) ) {
+
+	if ( $ping->pumpable() ) {
+		$ping->pump_nb();
+	}
+	elsif ( ( $dead_count % 10 ) == 0 ) {
+		$ping->start();
+	}
+
+	$column++;
+
+	if ( $column == $column_max ) {
+		print "\r";
+		$column = 0;
+	}
+
+	if ( $column != $column_max ) {
+		print "\e[1C \e[2D";
+	}
+
+	if ( $id != $last_id ) {
+		$beep = 1;
+		if ( $rtt < 300 ) {
+			print q{^};
+		}
+		else {
+			print q{-};
+		}
+		$last_id    = $id;
+		$dead_count = 0;
+	}
+	else {
+		$beep = 0;
+		$dead_count++;
+		if ( $dead_count > 30 ) {
+			$beep = 1;
+		}
+
+		print q{_};
+	}
+
+	STDOUT->flush();
+
+	if ( not $quiet ) {
+		if ($beep) {
+			$mixer->resume_music();
+		}
+		else {
+			$mixer->pause_music();
+		}
+	}
+}
+
+$ping->kill_kill( grace => 1 );
+
+__END__
+
+=head1 NAME
+
+B<ekgping> - Electrocardiograph-like visual and audible ping
+
+=head1 SYNOPSIS
+
+B<ekgping> [B<-q>] [B<-f> I<file>] I<host> [B<--> I<ping options>]
+
+=head1 VERSION
+
+version 1.0
+
+=head1 DESCRIPTION
+
+B<ekgping> pings a I<host>. Unlike ping(1), it does not output text, but
+instead displays the results in a visual and audible manner, somewhat similar
+to an electrocardiograph (short ECG / EKG).
+
+It displays a line on the whole width of the terminal. By default, the line is
+flat ("_"). Everytime a pong gets in, a spike ("^" or "-", depending on RTT)
+is drawn.
+
+Also, everytime a pong is received, a short beep is played. If the host does
+not respond for a few seconds (i.e. is unreachable/dead), B<ekgping> produces
+a continuous beep until the host is reachable again.
+
+If specified, I<ping options> are passed on to ping(1).  Note that B<ekgping>
+does not look at them - if they change the output format or set the ping
+interval too high, B<ekgping> will break.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-f>, B<--beep-file> I<file>
+
+Play I<file> instead of the default beeps. May be any sound / music file
+
+=item B<-q>, B<--quiet>
+
+Do not play beeps, visual output only
+
+=item B<-V>, B<--version>
+
+Show version information and exit
+
+=back
+
+=head1 EXIT STATUS
+
+Zero.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * ping(1)
+
+=item * File::ShareDir(3pm)
+
+=item * IPC::Run(3pm)
+
+=item * SDL(3pm)
+
+=item * Term::Size(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+B<ekgping> parses the output of ping(1), which means it assumes a certain
+output style. It will only work with ping(1) programs whose C<< ping -n >> output matches
+"<digit> bytes from <ip>: icmp_req=<digit> ttl=<digit> time=<float>".
+
+=head1 AUTHOR
+
+Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.

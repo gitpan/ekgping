@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 3ac776822b0d2c1c451f557484ef2630c5caa692 Build.PL
+SHA1 f8601dcae357ae4c13218577b55d170f70bd14ef COPYING
+SHA1 096feea8ca978c4c759d52b08b8996a926cf658b Changelog
+SHA1 e5333e958cdf5ab665edef75af6b93d2f4ce5d98 MANIFEST
+SHA1 77b96a8ed341d96a668af942b6034a2a9f8a3d49 META.yml
+SHA1 e29a7d3aee27f913f8621375ffa0aa91b400d700 README
+SHA1 6e276ade027dff6ec96c22ef7bd9579f8a8d371d bin/ekgping
+SHA1 b9a3b94ca4643c416e901f3467e7ff8f5bfea3ae share/beep.ogg
+SHA1 3adfc7da6082f15051da7fbda884723388738b61 t/01-compile-pl.t
+SHA1 fd251ffc56ca6e52020c906b61158f78b035679d t/10-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBCAAGBQJN+RbEAAoJEBANW/tRZuAFZWwP/1UF6ZoChM1c71zcJE2HqNUn
+26LLTPZv7Xv6f4pV+PWxmCv0hnfSep+7HQX7qUZXyZw1dTvYr8PJxdzJDlmnmJqQ
+RyqYC05BwyCmKJIJF1FtKbodcjtI/2SV0qDaQMV8s51Si9CyFw1mEAT40XIGg3eE
++tzOy91Pcssp9qee5Tj/5X8/9HdpZsLPIvHlNn41ajs21HvxLSdYpwikeP0xMmR2
+NTWApRF9B5o9cYovHXMkCK/m5++BmrQXNcvCDRbgQz5H63xCNtrrqNEH+iJNPxw+
+t1wzGa9D0XdImikNBJAX+8yequgir9vQ9goJp2W+zxiWsICZ0tj9m7qxzFaGkY3a
+Xdgun+fAuvhoVruiIL5lICpQlSy6Wuor4orrSNnL56hExFJIC2RkFWjYT++KQY2c
+UF5a9XfxDTfDAdoSHRBTU5o7IAp0znXJBxouQwEMsfKyuKH/GvwgrHfEu5ROX+La
+yvrmwmZ0OFVgMtZzz1l8yVfTzELeS0H+ifawnlUnOC9QU8TYlMtGLzJUnognnJwH
+mS16ZRBGn127V0QVDfGYl8WObTR5rhhhDrgmQExpfgpLDFyLMMSvZ4D0mhbnCE5s
+RfVcW1/Pu77eX49qD1Jhxof0e0rrFVn9ieCKwJzEf2wvYbK34lhuKqJQZ7yTP8w7
+DqXOHI3orvdsORZHr44s
+=EmEN
+-----END PGP SIGNATURE-----

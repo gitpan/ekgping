@@ -1,0 +1,26 @@
+---
+abstract: 'Electrocardiograph-like visual and audible ping'
+author:
+  - 'Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
+build_requires:
+  Test::Compile: 0
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ekgping
+requires:
+  File::ShareDir: 1.00
+  Getopt::Long: 0
+  IO::Handle: 0
+  IPC::Run: 0
+  SDL: 0
+  Term::Size: 0
+  Time::HiRes: 0
+  perl: v5.10.0
+version: 1.0
