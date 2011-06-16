@@ -3,9 +3,9 @@ Build.PL
 Changelog
 COPYING
 MANIFEST			This list of files
+META.yml
 README
 share/beep.ogg
 t/01-compile-pl.t
 t/10-pod.t
-META.yml
 SIGNATURE    Added here by Module::Build
